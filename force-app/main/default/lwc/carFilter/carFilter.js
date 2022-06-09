@@ -17,7 +17,8 @@ export default class CarFilter extends LightningElement {
 
     filters = {
         searchKey:'',
-        maxPrice:999999
+        maxPrice:999999,
+        sortKey:''
     }
 
     categoryError = CATEGORY_ERROR
@@ -75,6 +76,12 @@ export default class CarFilter extends LightningElement {
         this.sendDataToCarList()
     }
 
+    handleRadioGroup(event){
+        console.log('handleRadioGroup5')
+        this.filters = {...this.filters,"sortKey":event.target.value}
+        this.sendDataToCarList()
+    }
+
     sendDataToCarList(){
         window.clearTimeout(this.timer)
         this.timer = window.setTimeout(()=>{
@@ -83,5 +90,14 @@ export default class CarFilter extends LightningElement {
             })
         }, 400)
         
+    }
+
+    value = '';
+
+    get options() {
+        return [
+            { label: 'High to Low', value: 'highttolow' },
+            { label: 'Low to High', value: 'lowtohigh' },
+        ];
     }
 }

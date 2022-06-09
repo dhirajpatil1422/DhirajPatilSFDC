@@ -9,14 +9,16 @@ public with sharing class CarController {
         public String[] categories {get;set;}
         @AuraEnabled
         public String[] makeType {get;set;}
+        @AuraEnabled
+        public String sortKey {get;set;}
     }
 
     @AuraEnabled(Cacheable=true)
     public static List<Car__c> getCars(Filters filters){
-        String key, whereClause = '';
+        String key, whereClause = '',orderByClause = 'ORDER BY Name';
         Decimal maxPrice;
         String[] categories,makeType,criteria = new List<String>{};
-        if(filters !=null){
+        if(filters != null){
             maxPrice = filters.maxPrice;
             categories = filters.categories;
             makeType = filters.makeType;
@@ -36,8 +38,16 @@ public with sharing class CarController {
             if(criteria.size()>0){
                 whereClause =  'WHERE ' + String.join(criteria, ' AND ');
             }
+
+            if(!String.isEmpty(filters.sortKey)){
+                if(filters.sortKey == 'highttolow'){
+                    orderByClause = 'ORDER BY MSRP__c DESC';
+                }else{
+                    orderByClause = 'ORDER BY MSRP__c ASC'; 
+                }
+            }
         }
-        String query = 'SELECT Id, Name, MSRP__c, Description__c, Category__c, Picture_URL__c FROM Car__c ' + whereClause + ' WITH SECURITY_ENFORCED  ORDER BY Name';
+        String query = 'SELECT Id, Name, MSRP__c, Description__c, Category__c, Picture_URL__c FROM Car__c ' + whereClause + ' WITH SECURITY_ENFORCED  '+orderByClause;
         return Database.query(query);
     } 
 
